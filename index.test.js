@@ -1,4 +1,4 @@
-const {Observable,LinkedState} = require(".");
+const {Observable,LinkedState,StateObservable} = require(".");
 
 describe("testing index3", () => {
     it("testing observable and subscribe", () => {
@@ -215,4 +215,29 @@ describe("testing LinkedState", () => {
         expect(store.getState()).toEqual(thirdState)
         expect(store.getLength()).toEqual(3)
     })
+})
+
+
+describe("state obserable", () => {
+    it("insert and subscribe", () => {
+        const store = StateObservable(firstState)
+        let result;
+        store.subscribe(x => {
+            result = x;
+        })
+        expect(result).toEqual(firstState)
+
+    })
+    it("insert two states", () => {
+        const newStore = new LinkedState()
+        const store = StateObservable(newStore)
+        store
+        .tap(store => store.insert(firstState))
+        .tap(store => store.insert(secondState))
+        .subscribe(x => result = x)
+        expect(result.getState()).toEqual(secondState)
+        expect(result.getInitialState()).toEqual(firstState)
+        expect(result.getLength()).toEqual(2)
+    })
+    
 })

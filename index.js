@@ -215,6 +215,31 @@ const stateMachine = (() => {
             })
         }
         /**
+         * @description in order to handle side effect
+         * @param {function} fn 
+         */
+        tap(fn){
+            return new Observable(observer => {
+                this.subscribe({
+                    next(data){
+                       try{
+                        fn(data)
+                        observer.next(data)
+                       }
+                       catch(err){
+                           observer.error(err)
+                       }
+                    },
+                    error(err){
+                        observer.error(err)
+                    },
+                    complete(){
+                        observer.complete()
+                    }
+                })
+            })
+        }
+        /**
          * 
          * @param {function} fn
          * @returns {Observable} 
@@ -500,12 +525,27 @@ const stateMachine = (() => {
         }
     }
 
-    
+    /**
+     * 
+     * @param {LinkedState} state 
+     */
+    const StateObservable = (state) => {
+        return new Observable(observer => {
+            try{
+                observer.next(state)
+                observer.complete()
+            }
+            catch(err){
+                observer.error(err)
+            }
+        })
+    }
 
 
     return{
         Observable,
-        LinkedState
+        LinkedState,
+        StateObservable
     }
 })()
 
