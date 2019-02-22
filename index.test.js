@@ -1,4 +1,4 @@
-const {Observable} = require(".");
+const {Observable,LinkedState} = require(".");
 
 describe("testing index3", () => {
     it("testing observable and subscribe", () => {
@@ -77,5 +77,72 @@ describe("testing index3", () => {
             result.push(x)
         })
         expect(result).toEqual([2,3,4,5,6,"aa"])
+    })
+})
+
+let firstState
+let secondState
+let thirdState
+
+beforeAll(() => {
+     firstState = {
+        data:"yess"
+    }
+     secondState = {
+        data:"second"
+    }
+    thirdState = {
+        data:"third"
+    }
+})
+
+describe("testing LinkedState", () => {
+    it("add a first state", () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        expect(store.getState()).toEqual(firstState)
+    })
+    it('add a second state', () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        expect(store.getState()).toEqual(secondState)
+        expect(store.getPrevState()).toEqual(firstState)
+        expect(store.getInitialState()).toEqual(firstState)
+        expect(store.getLength()).toEqual(2)
+    })
+    it("add three state", () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState)
+        expect(store.getInitialState()).toEqual(firstState)
+        expect(store.getLength()).toEqual(3)
+        expect(store.getPrevState()).toEqual(secondState)
+        expect(store.getState()).toEqual(thirdState)
+    })
+    it('pop the current state', () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState)
+        const popedState = store.pop();
+        expect(popedState).toEqual(thirdState)
+        expect(store.getLength()).toEqual(2)
+        expect(store.getState()).toEqual(secondState)
+        expect(store.getPrevState()).toEqual(firstState)
+        expect(store.getInitialState()).toEqual(firstState)
+    })
+    it("shift the initial state", () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState)
+        const shiftedState = store.shift()
+        expect(shiftedState).toEqual(firstState)
+        expect(store.getLength()).toEqual(2)
+        expect(store.getInitialState()).toEqual(secondState)
+        expect(store.getState()).toEqual(thirdState)
+        expect(store.getPrevState()).toEqual(secondState)
     })
 })

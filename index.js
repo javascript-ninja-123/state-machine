@@ -323,9 +323,116 @@ const stateMachine = (() => {
        }
     }
 
+    class State{
+        /**
+         * 
+         * @param {object} state 
+         */
+        constructor(state = {}){
+            this.state = state
+            this.prev = null;
+            this.next = null;
+        }
+
+        get getState(){
+            return this.state
+        }
+    }
+
+    class LinkedState{
+        /**
+         * @var {object | null } this.head 
+         * @var {object | null} this.tail  
+         * @var {number} this.length
+         */
+        constructor(){
+            this.head = null;
+            this.tail = null;
+            this.length = 0;
+        }
+        //add to last
+        insert(state = util.required()){
+            const store = new State(state)
+            //there is no state inserted yet
+            if(this.length === 0){
+                this.head = store;
+                this.tail = store;
+                this.length++
+                return;
+            }
+            else if(this.length === 1){
+                this.tail = store;
+                this.head.next = this.tail
+                this.tail.prev = this.head
+                this.length++
+                return
+            }
+            //there is a node
+            const prevTail = this.tail
+            this.tail = store;
+            this.tail.prev = prevTail
+            prevTail.next = this.tail
+            this.length++
+        }
+        /**
+         * @returns {object | null} state
+         */
+        shift(){
+            //there is nothing
+            if(this.length === 0) return null
+            //remove the last standing state
+            else if(this.length === 1){
+                const prevState = this.head;
+                this.head = null
+                this.tail = null
+                this.length = 0
+                return prevState.getState;
+            }
+            //there is more than 1
+            const prevHead = this.head
+            this.head = prevHead.next;
+            this.length--;
+            return prevHead.getState
+        }
+        //remove current state
+        /**
+         * @returns {object | null} state
+         */
+        pop(){
+            //there is nothing
+            if(this.length === 0) return null
+            //last state
+            else if(this.length === 1){
+                const prevHead = this.head;
+                this.head= null
+                this.tail = null
+                this.length--;
+                return prevHead.getState
+            }
+            //more than 1
+            const prevTail = this.tail;
+            this.tail = prevTail.prev;
+            this.length--;
+            return prevTail.getState;
+        }
+        getState(){
+            return this.tail.getState;
+        }
+        getInitialState(){
+            return this.head.getState
+        }
+        getPrevState(){
+            return this.tail.prev.getState;
+        }
+        getLength(){
+            return this.length;
+        }
+    }
+
 
     return{
-        Observable
+        Observable,
+        LinkedState
     }
 })()
 
