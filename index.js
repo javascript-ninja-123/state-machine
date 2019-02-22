@@ -354,6 +354,7 @@ const stateMachine = (() => {
             this.head = null;
             this.tail = null;
             this.length = 0;
+            this.limit = null
         }
         //add to last
         insert(state = util.required()){
@@ -370,6 +371,11 @@ const stateMachine = (() => {
                 this.head.next = this.tail
                 this.tail.prev = this.head
                 this.length++
+                return
+            }
+            //exceed the limit
+            //jsut return
+            else if(this.length === this.limit){
                 return
             }
             //there is a node
@@ -474,6 +480,23 @@ const stateMachine = (() => {
         replace(newState = util.required()){
             this.tail.setState = newState
             return newState
+        }
+        rollback(){
+          return this.pop();
+        }
+        reset(){
+            const prevHead = this.head
+            prevHead.next = null
+            prevHead.prev = null
+            this.head = prevHead
+            this.tail = prevHead
+            this.length = 1;
+        }
+        /**
+         * @param {number} num
+         */
+        setLimit(num){
+            this.limit = num;
         }
     }
 

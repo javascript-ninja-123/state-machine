@@ -185,4 +185,34 @@ describe("testing LinkedState", () => {
         store.replace(newState)
         expect(store.getState()).toEqual(newState)
     })
+    it("rollback", () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState) 
+        const oldState = store.rollback();
+        expect(oldState).toEqual(thirdState)
+        expect(store.getState()).toEqual(secondState)
+    })
+    it("reset", () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState) 
+        store.reset()
+        expect(store.getState()).toEqual(firstState)
+    })
+    it("set limit", () => {
+        const store = new LinkedState()
+        store.setLimit(3);
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState) 
+        store.insert({
+            data:"ss"
+        }) 
+
+        expect(store.getState()).toEqual(thirdState)
+        expect(store.getLength()).toEqual(3)
+    })
 })
