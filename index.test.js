@@ -61,4 +61,21 @@ describe("testing index3", () => {
         })
         expect(result).toEqual([2,3,4,5,6])
     })
+
+    it("test obesrvable and of", () => {
+
+        const of = Observable.of(1,2,3,4,5,"aa")
+        const result = []
+        of
+        .map(x => {
+            if(typeof x === 'number'){
+                return x + 1
+            }
+            return x
+        })
+        .subscribe(x => {
+            result.push(x)
+        })
+        expect(result).toEqual([2,3,4,5,6,"aa"])
+    })
 })

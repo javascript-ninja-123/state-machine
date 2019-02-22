@@ -272,6 +272,55 @@ const stateMachine = (() => {
             }
         })
        }
+       /**
+        * 
+        * @param  {...any} args 
+        */
+       static of(...args){
+        return new Observable(observer => {
+            try{
+                args.forEach(value => observer.next(value))
+                observer.complete()
+            }catch(err){
+                observer.error(err)
+            }
+        })
+       }
+       /**
+        * 
+        * @param {number} num 
+        */
+       retry(num = 0){
+           let counter = 1;
+           return new Observable(observer => {
+                try{
+                    const x = {
+                        next(data){
+                            observer.next(data)
+                        },
+                        error(err){
+                            if(counter === num){
+                                observer.error(err)
+                                return
+                            }
+                            else if(num === 0){
+                                observer.error(err)
+                                return;
+                            }
+                            counter++
+                            this.subscribe(x)
+                        },
+                        complete(){
+                            observer.complete()
+                        }
+                    }
+                    this.subscribe(x)
+                }
+                catch(err){
+                    observer.error(err)
+                }
+           })
+       }
     }
 
 
