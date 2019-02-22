@@ -394,21 +394,37 @@ const stateMachine = (() => {
             else if(this.length === 1){
                 this.tail = store;
                 this.head.next = this.tail
+                this.freeze(this.head.getState)
                 this.tail.prev = this.head
                 this.length++
                 return
             }
             //exceed the limit
-            //jsut return
+            //remove the initial state
+            //add a new state as a current state
             else if(this.length === this.limit){
+                const prevHead = this.head;
+                const prevTail = this.tail;
+                this.freeze(prevTail.getState)
+                this.head = prevHead.next;
+                this.tail = store
+                store.prev = prevTail;
                 return
             }
             //there is a node
             const prevTail = this.tail
             this.tail = store;
+            this.freeze(prevTail.getState)
             this.tail.prev = prevTail
             prevTail.next = this.tail
             this.length++
+        }
+        /**
+         * @description it freezes the state 
+         * @param {object} state 
+         */
+        freeze(state){
+            Object.freeze(state)
         }
         /**
          * @returns {object | null} state

@@ -212,8 +212,24 @@ describe("testing LinkedState", () => {
             data:"ss"
         }) 
 
-        expect(store.getState()).toEqual(thirdState)
+        expect(store.getState()).toEqual({
+            data:"ss"
+        })
+        expect(store.getPrevState()).toEqual(thirdState)
         expect(store.getLength()).toEqual(3)
+    })
+    it("check object freeze", () => {
+        const store = new LinkedState()
+        store.setLimit(3);
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState) 
+        store.getInitialState().data = "changed"
+        expect(store.getInitialState()).toEqual({
+            data:{
+                data:"first"
+            }
+        })
     })
 })
 
