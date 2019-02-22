@@ -86,13 +86,19 @@ let thirdState
 
 beforeAll(() => {
      firstState = {
-        data:"yess"
+        data:{
+            data:"first"
+        }
     }
      secondState = {
-        data:"second"
+        data:{
+            data:"second"
+        }
     }
     thirdState = {
-        data:"third"
+        data:{
+            data:"third"
+        }
     }
 })
 
@@ -144,5 +150,39 @@ describe("testing LinkedState", () => {
         expect(store.getInitialState()).toEqual(secondState)
         expect(store.getState()).toEqual(thirdState)
         expect(store.getPrevState()).toEqual(secondState)
+    })
+
+    it("find", () => {
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState)
+        const stateArray = store.find(["data",'data'])
+        expect(stateArray).toEqual(['first','second','third'])
+    })
+
+    it("update", () => {
+        const newText = "updated value"
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState)
+        const updatedState = store.update(['data','data'], newText)
+        expect(store.getState()).toEqual(updatedState)
+    })
+
+    it("replace", () => {
+        const newState = {
+            data:{
+                data:"third"
+            },
+            newData:[1,2,3,3,4]
+        }
+        const store = new LinkedState()
+        store.insert(firstState)
+        store.insert(secondState)
+        store.insert(thirdState) 
+        store.replace(newState)
+        expect(store.getState()).toEqual(newState)
     })
 })

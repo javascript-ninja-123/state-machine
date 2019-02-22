@@ -1,3 +1,5 @@
+const R = require('ramda');
+
 
 const stateMachine = (() => {
     /**
@@ -337,6 +339,9 @@ const stateMachine = (() => {
         get getState(){
             return this.state
         }
+        set setState(state){
+            this.state = state;
+        }
     }
 
     class LinkedState{
@@ -427,7 +432,52 @@ const stateMachine = (() => {
         getLength(){
             return this.length;
         }
+        /**
+         * 
+         * @param {array} key 
+         * @returns {array} stateArray
+         */
+        find(key = util.required()){
+            //initialState => currentState
+            const stateArray = [];
+            const path = R.lensPath(key)
+            const recurse = (store) => {
+                if(!store) return;
+                else{
+                    const state = store.getState
+                    const data = R.view(path, state)
+                    if(data){
+                        stateArray.push(data)
+                    }
+                    recurse(store.next)
+                }
+            }
+            recurse(this.head)
+
+            return stateArray;
+        }
+        /**
+         * 
+         * @param {array} path
+         * @param {any} newValue 
+         */
+        update(path = util.required(), newValue = util.required()){
+            const lens = R.lensPath(path)
+            const newState = R.set(lens, newValue, this.getState())
+            this.tail.setState = newState
+            return newState;
+        }
+        /**
+         * 
+         * @param {object} newState 
+         */
+        replace(newState = util.required()){
+            this.tail.setState = newState
+            return newState
+        }
     }
+
+    
 
 
     return{
