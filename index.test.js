@@ -229,6 +229,7 @@ describe("state obserable", () => {
 
     })
     it("insert two states", () => {
+        let result
         const newStore = new LinkedState()
         const store = StateObservable(newStore)
         store
@@ -238,6 +239,37 @@ describe("state obserable", () => {
         expect(result.getState()).toEqual(secondState)
         expect(result.getInitialState()).toEqual(firstState)
         expect(result.getLength()).toEqual(2)
+    })
+
+    it("insert and update", () => {
+        let result
+        const newStore = new LinkedState()
+        const store = StateObservable(newStore)
+        store
+        .tap(store => store.insert(firstState))
+        .tap(store => store.insert(secondState))
+        .tap(store => store.update(["data","data"], "updated again and again"))
+        .subscribe(x => result = x)
+
+        expect(result.getState()).toEqual({
+            data:{
+                data:"updated again and again"
+            }
+        })
+    })
+
+    it("insert and roolback", () => {
+        let result;
+        const newStore = new LinkedState()
+        const store = StateObservable(newStore)
+        store
+        .tap(store => store.insert(firstState))
+        .tap(store => store.insert(secondState))
+        .tap(store => store.insert(thirdState))
+        .tap(store => store.rollback())
+        .subscribe(x => result = x)
+
+        expect(result.getState()).toEqual(secondState)
     })
     
 })
